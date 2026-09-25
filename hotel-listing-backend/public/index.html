@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hotel Listing API</title>
+<style>
+  :root {
+    --bg: #f7f7f5; --panel: #ffffff; --text: #1d1d1f; --muted: #6b6b70; --line: #e4e4e0;
+    --code-bg: #f1f1ee; --accent: #2f6fdf;
+    --get: #1f8a4c; --post: #2f6fdf; --patch: #b26a00; --delete: #c93b3b; --put: #7a4fd1;
+    --badge-text: #ffffff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #141416; --panel: #1c1c1f; --text: #ececef; --muted: #9a9aa2; --line: #2c2c31;
+      --code-bg: #232327; --accent: #7aa7ff;
+      --get: #4cc47f; --post: #7aa7ff; --patch: #e0a040; --delete: #f06b6b; --put: #b18cff;
+      --badge-text: #141416;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+  :not(pre) > code { background: var(--code-bg); padding: 1px 6px; border-radius: 4px; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  .layout { display: grid; grid-template-columns: 230px minmax(0, 1fr); max-width: 1180px; margin: 0 auto; }
+  nav { position: sticky; top: 0; height: 100vh; overflow-y: auto; padding: 32px 20px; border-right: 1px solid var(--line); }
+  nav .brand { font-weight: 700; font-size: 16px; margin-bottom: 20px; }
+  nav .group { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .06em; margin: 20px 0 6px; }
+  nav a { display: flex; gap: 8px; align-items: center; color: var(--text); padding: 4px 0; font-size: 14px; }
+  nav a .m { font-size: 10px; min-width: 46px; }
+  main { padding: 40px 48px 80px; min-width: 0; }
+
+  h1 { font-size: 30px; margin: 0 0 8px; }
+  h2 { font-size: 20px; margin: 48px 0 12px; padding-top: 8px; }
+  h3 { font-size: 15px; margin: 20px 0 8px; }
+  p { margin: 8px 0; }
+  .lead { color: var(--muted); font-size: 16px; margin-bottom: 24px; }
+
+  .base { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; }
+  .base span { color: var(--muted); font-size: 13px; }
+
+  .m { display: inline-block; font-weight: 700; font-size: 11px; letter-spacing: .04em; padding: 2px 7px; border-radius: 4px; color: var(--badge-text); text-align: center; font-family: ui-monospace, Menlo, monospace; }
+  .m.get { background: var(--get); } .m.post { background: var(--post); } .m.patch { background: var(--patch); }
+  .m.delete { background: var(--delete); } .m.put { background: var(--put); }
+
+  .ep { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 20px 22px; margin: 16px 0 24px; scroll-margin-top: 20px; }
+  .ep-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .ep-head code { font-size: 15px; font-weight: 600; background: none; padding: 0; }
+  .tag { white-space: nowrap; font-size: 12px; padding: 2px 8px; border-radius: 99px; border: 1px solid var(--line); color: var(--muted); }
+  .tag.lock { color: var(--patch); border-color: currentColor; }
+
+  table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 14px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+  .table-wrap { overflow-x: auto; }
+
+  .code { position: relative; margin: 8px 0; }
+  .code .label { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+  pre { background: var(--code-bg); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; overflow-x: auto; margin: 0; }
+  .copy { position: absolute; top: 28px; right: 8px; font-size: 12px; background: var(--panel); color: var(--muted); border: 1px solid var(--line); border-radius: 6px; padding: 3px 9px; cursor: pointer; }
+  .copy:hover { color: var(--text); }
+  .grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+  .note { border-left: 3px solid var(--accent); background: var(--panel); padding: 10px 14px; border-radius: 0 8px 8px 0; margin: 12px 0; }
+  .status { font-family: ui-monospace, Menlo, monospace; font-weight: 600; }
+
+  @media (max-width: 860px) {
+    .layout { grid-template-columns: minmax(0, 1fr); }
+    nav { display: none; }
+    main { padding: 24px 16px 60px; }
+    .grid2 { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav>
+    <div class="brand">🏨 Hotel Listing API</div>
+    <div class="group">Getting started</div>
+    <a href="#overview">Overview</a>
+    <a href="#auth">Authentication</a>
+    <a href="#errors">Errors</a>
+    <div class="group">Auth</div>
+    <a href="#register"><span class="m post">POST</span>/register</a>
+    <a href="#login"><span class="m post">POST</span>/login</a>
+    <div class="group">Hotels</div>
+    <a href="#list"><span class="m get">GET</span>/hotels</a>
+    <a href="#mine"><span class="m get">GET</span>/hotels?userId</a>
+    <a href="#one"><span class="m get">GET</span>/hotels/:id</a>
+    <a href="#create"><span class="m post">POST</span>/hotels</a>
+    <a href="#update"><span class="m patch">PATCH</span>/hotels/:id</a>
+    <a href="#delete"><span class="m delete">DELETE</span>/hotels/:id</a>
+    <div class="group">Guides</div>
+    <a href="#query">Filter, search &amp; pages</a>
+    <a href="#fields">Hotel fields</a>
+    <a href="#hints">Hints</a>
+  </nav>
+
+  <main>
+    <h1 id="overview">Hotel Listing API</h1>
+    <p class="lead">A REST API for hotel listings, with login and image uploads. It uses no database: data is saved to <code>data/db.json</code> and images to <code>uploads/</code>.</p>
+
+    <div class="base"><span>Base URL</span><code class="base-url">http://localhost:4000</code></div>
+
+    <div class="table-wrap">
+      <table style="margin-top:20px">
+        <tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Description</th></tr>
+        <tr><td><span class="m post">POST</span></td><td><a href="#register"><code>/register</code></a></td><td>–</td><td>Create an account</td></tr>
+        <tr><td><span class="m post">POST</span></td><td><a href="#login"><code>/login</code></a></td><td>–</td><td>Log in, returns token</td></tr>
+        <tr><td><span class="m get">GET</span></td><td><a href="#list"><code>/hotels</code></a></td><td>–</td><td>All listings (filter, search, pagination)</td></tr>
+        <tr><td><span class="m get">GET</span></td><td><a href="#mine"><code>/hotels?userId=3</code></a></td><td>–</td><td>One user's properties</td></tr>
+        <tr><td><span class="m get">GET</span></td><td><a href="#one"><code>/hotels/:id</code></a></td><td>–</td><td>One listing</td></tr>
+        <tr><td><span class="m post">POST</span></td><td><a href="#create"><code>/hotels</code></a></td><td>Token</td><td>Add a property (body must include <code>userId</code>)</td></tr>
+        <tr><td><span class="m patch">PATCH</span></td><td><a href="#update"><code>/hotels/:id</code></a></td><td>Owner</td><td>Edit a property</td></tr>
+        <tr><td><span class="m delete">DELETE</span></td><td><a href="#delete"><code>/hotels/:id</code></a></td><td>Owner</td><td>Delete a property</td></tr>
+      </table>
+    </div>
+
+    <h2 id="auth">Authentication</h2>
+    <p>Call <code>/register</code> or <code>/login</code> to get an <code>accessToken</code>. Send it in the <code>Authorization</code> header on every request marked <span class="tag lock">🔒 Token</span> or <span class="tag lock">🔒 Owner</span>. Tokens last 7 days.</p>
+    <div class="code"><div class="label">Header</div><pre>Authorization: Bearer &lt;accessToken&gt;</pre></div>
+
+    <h2 id="errors">Errors</h2>
+    <p>Every error response has the same shape: <code>{ "message": "..." }</code></p>
+    <div class="table-wrap"><table>
+      <tr><th>Status</th><th>Meaning</th></tr>
+      <tr><td class="status">400</td><td>Invalid input, for example a missing field, an email that is already registered, a wrong password, or a file that isn't an image</td></tr>
+      <tr><td class="status">401</td><td>The token is missing, invalid or expired</td></tr>
+      <tr><td class="status">403</td><td>You are not the owner, or <code>userId</code> doesn't match the logged-in user</td></tr>
+      <tr><td class="status">404</td><td>Hotel not found</td></tr>
+      <tr><td class="status">500</td><td>Server error</td></tr>
+    </table></div>
+
+    <!-- ============ AUTH ============ -->
+    <h2>Auth</h2>
+
+    <section class="ep" id="register">
+      <div class="ep-head"><span class="m post">POST</span><code>/register</code><span class="tag">Public</span></div>
+      <p>Creates a user and returns a token right away, so there is no need to log in afterwards.</p>
+      <div class="grid2">
+        <div class="code"><div class="label">Request body (JSON)</div><pre>{
+  "email": "ann@example.com",
+  "password": "secret123",
+  "name": "Ann"
+}</pre></div>
+        <div class="code"><div class="label">Response 201</div><pre>{
+  "accessToken": "eyJhbGciOi...",
+  "user": {
+    "id": 1,
+    "email": "ann@example.com",
+    "name": "Ann",
+    "createdAt": "2026-09-24T05:11:50.233Z"
+  }
+}</pre></div>
+      </div>
+    </section>
+
+    <section class="ep" id="login">
+      <div class="ep-head"><span class="m post">POST</span><code>/login</code><span class="tag">Public</span></div>
+      <div class="grid2">
+        <div class="code"><div class="label">Request body (JSON)</div><pre>{
+  "email": "ann@example.com",
+  "password": "secret123"
+}</pre></div>
+        <div class="code"><div class="label">Response 200</div><pre>{
+  "accessToken": "eyJhbGciOi...",
+  "user": { "id": 1, "email": "ann@example.com", "name": "Ann" }
+}</pre></div>
+      </div>
+    </section>
+
+    <!-- ============ HOTELS ============ -->
+    <h2>Hotels</h2>
+
+    <section class="ep" id="list">
+      <div class="ep-head"><span class="m get">GET</span><code>/hotels</code><span class="tag">Public</span></div>
+      <p>Returns an <b>array</b> of listings. It supports every <a href="#query">filter, search, sort and pagination parameter</a>. The total number of results is in the <code>X-Total-Count</code> response header.</p>
+      <div class="code"><div class="label">Example</div><pre><span class="base-url">http://localhost:4000</span>/hotels?q=beach&amp;price_lte=200&amp;_sort=price&amp;_order=asc&amp;_page=1&amp;_limit=10</pre></div>
+      <div class="code"><div class="label">Response 200 (header: X-Total-Count: 42)</div><pre>[
+  {
+    "id": 1,
+    "name": "Sea View Inn",
+    "description": "Beach-front hotel with ocean-view rooms",
+    "propertyType": "hotel",
+    "stars": 4,
+    "address": "12 Beach Road",
+    "city": "Goa",
+    "country": "India",
+    "price": 4500,
+    "currency": "INR",
+    "rooms": 25,
+    "maxGuests": 3,
+    "amenities": ["wifi", "pool", "breakfast"],
+    "rating": 4.5,
+    "reviewsCount": 128,
+    "available": true,
+    "userId": 1,
+    "images": [
+      "http://localhost:4000/uploads/1790226710984-0457cbf9780a.jpg",
+      "http://localhost:4000/uploads/1790226711404-b458518d82c1.jpg"
+    ],
+    "image": "http://localhost:4000/uploads/1790226710984-0457cbf9780a.jpg",
+    "createdAt": "2026-09-24T05:11:50.985Z",
+    "updatedAt": "2026-09-24T05:11:50.985Z"
+  }
+]</pre></div>
+    </section>
+
+    <section class="ep" id="mine">
+      <div class="ep-head"><span class="m get">GET</span><code>/hotels?userId=3</code><span class="tag">Public</span></div>
+      <p>My properties: pass the logged-in user's <code>id</code>. You can combine it with any other parameter, e.g. <code>/hotels?userId=3&amp;_page=1&amp;_limit=10</code>.</p>
+    </section>
+
+    <section class="ep" id="one">
+      <div class="ep-head"><span class="m get">GET</span><code>/hotels/:id</code><span class="tag">Public</span></div>
+      <p>Returns a single listing object, or <span class="status">404</span> if it doesn't exist.</p>
+    </section>
+
+    <section class="ep" id="create">
+      <div class="ep-head"><span class="m post">POST</span><code>/hotels</code><span class="tag lock">🔒 Token</span></div>
+      <p>Required: <b><code>userId</code></b> (it must equal the logged-in user's id) and <b><code>name</code></b>. Every other field is optional. See <a href="#fields">Hotel fields</a> for the full list.</p>
+      <p>To upload images, send the request as <code>FormData</code>, with files in <code>images</code>. Without images, plain JSON works too. See <a href="#hints">Hints</a>.</p>
+      <p>The response is <span class="status">201</span> with the created hotel. The server sets <code>id</code>, <code>image</code>, <code>createdAt</code> and <code>updatedAt</code>.</p>
+    </section>
+
+    <section class="ep" id="update">
+      <div class="ep-head"><span class="m patch">PATCH</span><code>/hotels/:id</code><span class="tag lock">🔒 Owner</span></div>
+      <p>Send only the fields you want to change. Only the owner can edit. <code>id</code>, <code>userId</code> and <code>createdAt</code> cannot be changed. <code>PUT</code> works the same way.</p>
+      <div class="table-wrap"><table>
+        <tr><th>Images you want</th><th>What to send</th></tr>
+        <tr><td>Add new images</td><td>Upload files in <code>images</code>; they are appended</td></tr>
+        <tr><td>Remove some images</td><td>Send <code>images</code> = the URLs to <b>keep</b>; the rest are deleted</td></tr>
+        <tr><td>Remove all images</td><td>Send <code>images</code> as an empty string (form-data) or <code>[]</code> (JSON)</td></tr>
+        <tr><td>Leave images as they are</td><td>Don't send <code>images</code> at all</td></tr>
+      </table></div>
+      <div class="code"><div class="label">JSON</div><pre>{ "price": 99, "description": "Now with breakfast" }</pre></div>
+    </section>
+
+    <section class="ep" id="delete">
+      <div class="ep-head"><span class="m delete">DELETE</span><code>/hotels/:id</code><span class="tag lock">🔒 Owner</span></div>
+      <p>Deletes the listing and its image files. Returns <code>{}</code>.</p>
+    </section>
+
+    <!-- ============ GUIDES ============ -->
+    <h2 id="query">Filter, search &amp; pagination</h2>
+    <p>These work on <code>GET /hotels</code> and can be combined with each other.</p>
+    <div class="table-wrap"><table>
+      <tr><th>What</th><th>Parameter</th><th>Example</th></tr>
+      <tr><td>Search (all fields)</td><td><code>q</code> or <code>search</code></td><td><code>?q=beach</code></td></tr>
+      <tr><td>Exact match</td><td><code>field=value</code></td><td><code>?city=Goa</code></td></tr>
+      <tr><td>Match any of several values</td><td>repeat the key</td><td><code>?city=Goa&amp;city=Delhi</code></td></tr>
+      <tr><td>Greater / less than</td><td><code>_gte</code> <code>_lte</code> <code>_gt</code> <code>_lt</code></td><td><code>?price_gte=50&amp;price_lte=200</code></td></tr>
+      <tr><td>Contains</td><td><code>_like</code></td><td><code>?name_like=inn</code></td></tr>
+      <tr><td>Not equal</td><td><code>_ne</code></td><td><code>?city_ne=Goa</code></td></tr>
+      <tr><td>Sort</td><td><code>_sort</code>, <code>_order</code></td><td><code>?_sort=price&amp;_order=desc</code></td></tr>
+      <tr><td>Pagination</td><td><code>_page</code>, <code>_limit</code> (or <code>page</code>, <code>limit</code>)</td><td><code>?_page=2&amp;_limit=10</code></td></tr>
+    </table></div>
+    <div class="note">Paginated responses include an <code>X-Total-Count</code> header with the total number of matches, and a <code>Link</code> header with first, prev, next and last page URLs. Use them to work out the number of pages: <code>Math.ceil(total / limit)</code>.</div>
+
+    <h2 id="fields">Hotel fields</h2>
+    <p>Use these fields for the add and edit forms and for the listing cards. Every field can be filtered, sorted and searched, for example <code>?city=Goa&amp;stars_gte=4&amp;amenities=pool&amp;_sort=price</code>. You can also send extra fields that aren't listed here; they are saved as they are.</p>
+    <div class="table-wrap"><table>
+      <tr><th>Field</th><th>Type</th><th>Example</th><th>Notes</th></tr>
+      <tr><td colspan="4"><b>Basic</b></td></tr>
+      <tr><td><code>userId</code></td><td>number</td><td><code>1</code></td><td><b>Required</b>, the logged-in user's id</td></tr>
+      <tr><td><code>name</code></td><td>string</td><td><code>Sea View Inn</code></td><td><b>Required</b></td></tr>
+      <tr><td><code>description</code></td><td>string</td><td><code>Beach-front hotel with…</code></td><td></td></tr>
+      <tr><td><code>propertyType</code></td><td>string</td><td><code>hotel</code></td><td>hotel, resort, villa, apartment, hostel, guest-house</td></tr>
+      <tr><td><code>stars</code></td><td>number</td><td><code>4</code></td><td>1–5</td></tr>
+      <tr><td colspan="4"><b>Location</b></td></tr>
+      <tr><td><code>address</code></td><td>string</td><td><code>12 Beach Road</code></td><td></td></tr>
+      <tr><td><code>city</code></td><td>string</td><td><code>Goa</code></td><td></td></tr>
+      <tr><td><code>state</code></td><td>string</td><td><code>Goa</code></td><td></td></tr>
+      <tr><td><code>country</code></td><td>string</td><td><code>India</code></td><td></td></tr>
+      <tr><td><code>zipCode</code></td><td>string</td><td><code>403001</code></td><td></td></tr>
+      <tr><td><code>latitude</code> / <code>longitude</code></td><td>number</td><td><code>15.49</code> / <code>73.82</code></td><td>For a map</td></tr>
+      <tr><td colspan="4"><b>Price &amp; rooms</b></td></tr>
+      <tr><td><code>price</code></td><td>number</td><td><code>120</code></td><td>Per night</td></tr>
+      <tr><td><code>currency</code></td><td>string</td><td><code>INR</code></td><td></td></tr>
+      <tr><td><code>discount</code></td><td>number</td><td><code>10</code></td><td>Percent off</td></tr>
+      <tr><td><code>rooms</code></td><td>number</td><td><code>25</code></td><td>Total rooms</td></tr>
+      <tr><td><code>maxGuests</code></td><td>number</td><td><code>4</code></td><td>Per room</td></tr>
+      <tr><td><code>bedrooms</code> / <code>bathrooms</code></td><td>number</td><td><code>2</code> / <code>1</code></td><td></td></tr>
+      <tr><td colspan="4"><b>Features</b></td></tr>
+      <tr><td><code>amenities</code></td><td>string[]</td><td><code>["wifi","pool","parking"]</code></td><td>wifi, pool, parking, ac, gym, spa, restaurant, bar, breakfast, pet-friendly…</td></tr>
+      <tr><td><code>checkIn</code> / <code>checkOut</code></td><td>string</td><td><code>14:00</code> / <code>11:00</code></td><td></td></tr>
+      <tr><td><code>cancellationPolicy</code></td><td>string</td><td><code>Free cancellation 24h before</code></td><td></td></tr>
+      <tr><td><code>available</code></td><td>boolean</td><td><code>true</code></td><td>Hide or show the listing</td></tr>
+      <tr><td><code>featured</code></td><td>boolean</td><td><code>false</code></td><td>For a "featured" section</td></tr>
+      <tr><td colspan="4"><b>Reviews</b></td></tr>
+      <tr><td><code>rating</code></td><td>number</td><td><code>4.5</code></td><td>0–5</td></tr>
+      <tr><td><code>reviewsCount</code></td><td>number</td><td><code>128</code></td><td></td></tr>
+      <tr><td colspan="4"><b>Contact</b></td></tr>
+      <tr><td><code>phone</code></td><td>string</td><td><code>+91 98765 43210</code></td><td></td></tr>
+      <tr><td><code>email</code></td><td>string</td><td><code>stay@seaview.com</code></td><td></td></tr>
+      <tr><td><code>website</code></td><td>string</td><td><code>https://seaview.com</code></td><td></td></tr>
+      <tr><td colspan="4"><b>Images</b></td></tr>
+      <tr><td><code>images</code></td><td>files → string[]</td><td></td><td>Up to 10 images, 5 MB each. Saved as URLs</td></tr>
+      <tr><td><code>image</code></td><td>string</td><td></td><td>Set by the server: the first image, for use as a cover photo</td></tr>
+      <tr><td colspan="4"><b>Set by the server</b></td></tr>
+      <tr><td><code>id</code>, <code>createdAt</code>, <code>updatedAt</code></td><td></td><td></td><td>These cannot be changed</td></tr>
+    </table></div>
+
+    <h2 id="hints">Hints</h2>
+    <div class="table-wrap"><table>
+      <tr><th>Task</th><th>How</th></tr>
+      <tr><td><b>Upload images</b></td><td>Use <code>FormData</code> and add each file under the same key: <code>form.append("images", file)</code>. Put the other fields in the same form.</td></tr>
+      <tr><td><b>Content-Type</b></td><td>With <code>FormData</code>, <b>don't</b> set <code>Content-Type</code>; the browser sets it for you. With JSON, set <code>application/json</code>.</td></tr>
+      <tr><td><b>Token</b></td><td>Add <code>Authorization: Bearer &lt;accessToken&gt;</code> to add, edit and delete requests.</td></tr>
+      <tr><td><b>Arrays in FormData</b></td><td>Send them as JSON: <code>form.append("amenities", JSON.stringify(["wifi","pool"]))</code></td></tr>
+      <tr><td><b>Numbers &amp; booleans</b></td><td>Append them normally, e.g. <code>"120"</code> or <code>"true"</code>. The server converts them to real numbers and booleans.</td></tr>
+      <tr><td><b>Show images</b></td><td>Use <code>hotel.image</code> as the cover photo and <code>hotel.images</code> for a gallery. These are full URLs, so use them directly in <code>&lt;img src&gt;</code>.</td></tr>
+      <tr><td><b>Edit images</b></td><td>Adding new files appends them. To remove images, send <code>images</code> with the URLs you want to keep (see <a href="#update">PATCH</a>).</td></tr>
+      <tr><td><b>My properties</b></td><td><code>GET /hotels?userId=&lt;user.id&gt;</code></td></tr>
+      <tr><td><b>Pagination</b></td><td>Add <code>_page</code> and <code>_limit</code>. Read the total from the <code>X-Total-Count</code> header; the number of pages is <code>Math.ceil(total / limit)</code>.</td></tr>
+      <tr><td><b>Search box</b></td><td><code>?q=&lt;text&gt;</code> searches every field, including name, city and description.</td></tr>
+      <tr><td><b>Price filter</b></td><td><code>?price_gte=1000&amp;price_lte=5000</code></td></tr>
+      <tr><td><b>Keep the login</b></td><td>Save <code>accessToken</code> and <code>user</code> (in <code>localStorage</code>, for example). A <span class="status">401</span> response means the token has expired, so send the user back to login.</td></tr>
+    </table></div>
+    <div class="note">CORS allows <code>http://localhost:3000</code>. To allow other origins, change <code>CORS_ORIGIN</code> in <code>.env</code>.</div>
+  </main>
+</div>
+
+<script>
+  // Show the real address this server is running on
+  document.querySelectorAll('.base-url').forEach((el) => (el.textContent = location.origin));
+
+  // Copy buttons on code blocks
+  document.querySelectorAll('.code').forEach((block) => {
+    const btn = document.createElement('button');
+    btn.className = 'copy';
+    btn.textContent = 'Copy';
+    btn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(block.querySelector('pre').innerText);
+        btn.textContent = 'Copied';
+      } catch {
+        btn.textContent = 'Failed';
+      }
+      setTimeout(() => (btn.textContent = 'Copy'), 1500);
+    });
+    block.appendChild(btn);
+  });
+</script>
+</body>
+</html>
