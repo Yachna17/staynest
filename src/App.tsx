@@ -6,6 +6,9 @@ import RegisterPage from "./pages/RegisterPage.tsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthContextProvider } from "./context/AuthContext.tsx";
 import DashboardPage from "./pages/DashboardPage.tsx";
+import ProtectedRoutes from "./components/ProtectedRoutes.tsx";
+import AddHotelPage from "./pages/AddHotelPage.tsx";
+import EditHotelPage from "./pages/EditHotelPage.tsx";
 
 const queryClient = new QueryClient();
 
@@ -17,7 +20,11 @@ function App() {
           <Routes>
             <Route element={<Layout />}>
               <Route path="/" element={<LandingPage />} />
-              <Route path="/dashboard" element={<DashboardPage />} />
+              <Route element={<ProtectedRoutes />}>
+                <Route path="/dashboard" element={<DashboardPage />} />
+                <Route path="/dashboard/add" element={<AddHotelPage />} />
+                <Route path="/dashboard/edit/id" element={<EditHotelPage />} />
+              </Route>
             </Route>
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />

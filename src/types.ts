@@ -10,6 +10,16 @@ export interface Hotel {
   image: string | null;
 }
 
+export interface HotelFormValues {
+  name: string;
+  city: string;
+  address: string;
+  price: number;
+  rooms: number;
+  description: string;
+  image: string | null;
+}
+
 export interface User {
   id: number;
   name: string;

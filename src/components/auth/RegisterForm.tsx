@@ -29,8 +29,8 @@ export default function RegisterForm() {
   };
 
   return (
-    <div className="min-h-dvh w-full flex items-center justify-center bg-black p-4">
-      <div className="bg-white rounded-2xl p-8 w-full max-w-md">
+    <div className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm p-4">
+      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
         <h1 className="text-2xl font-semibold">Register</h1>
         <p className="text-gray-500 mt-1 mb-6">Welcome to StayNest</p>
 
