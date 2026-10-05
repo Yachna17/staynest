@@ -1,3 +1,17 @@
+/* Tailwind v4 entry point - this one line loads all the utility classes */
 @import "tailwindcss";
 
+/* Small global styles. Everything else is styled with Tailwind classes in the components */
+@layer base {
+  /* smooth scrolling when a link jumps to a section on the same page */
+  html {
+    scroll-behavior: smooth;
+  }
 
+  /* light grey page background so the white cards and forms stand out */
+  body {
+    background-color: #fafafa;
+    color: #171717;
+    -webkit-font-smoothing: antialiased;
+  }
+}

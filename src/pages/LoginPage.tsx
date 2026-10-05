@@ -1,7 +1,6 @@
 import LoginForm from "../components/auth/LoginForm";
 
-export default function LoginPage(){
-    return(
-        <LoginForm />
-    )
+// /login page. All the form logic lives in LoginForm.
+export default function LoginPage() {
+  return <LoginForm />;
 }

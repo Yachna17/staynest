@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
 import type { User } from "../types";
 
+// What every component can read from the context
 interface AuthContextType {
   user: User | null;
   token: string | null;
@@ -8,6 +9,7 @@ interface AuthContextType {
   logout: () => void;
 }
 
+// undefined by default, so useAuth() can detect use outside the provider
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 interface AuthProviderProps {
@@ -15,6 +17,8 @@ interface AuthProviderProps {
 }
 
 export function AuthContextProvider({ children }: AuthProviderProps) {
+  // The function form of useState runs only once, on the first render.
+  // It reads localStorage, which is why the user stays logged in after a refresh.
   const [user, setUser] = useState<User | null>(() => {
     const stored = localStorage.getItem("user");
     return stored ? JSON.parse(stored) : null;
@@ -24,6 +28,7 @@ export function AuthContextProvider({ children }: AuthProviderProps) {
     return localStorage.getItem("token");
   });
 
+  // Called after a successful login or register: save in state AND localStorage
   function login(user: User, token: string) {
     setUser(user);
     setToken(token);
@@ -31,6 +36,7 @@ export function AuthContextProvider({ children }: AuthProviderProps) {
     localStorage.setItem("token", token);
   }
 
+  // Clear both state and localStorage
   function logout() {
     setUser(null);
     setToken(null);
@@ -43,6 +49,7 @@ export function AuthContextProvider({ children }: AuthProviderProps) {
   );
 }
 
+// Custom hook: const { user, token, login, logout } = useAuth();
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
