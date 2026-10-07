@@ -19,7 +19,9 @@ export default function AddHotelPage() {
       // and the dashboard load fresh data including the new hotel
       queryClient.invalidateQueries({ queryKey: ["hotels"] });
       // go to the dashboard and pass a message for it to show
-      navigate("/dashboard", { state: { message: "Hotel added successfully" } });
+      navigate("/dashboard", {
+        state: { message: "Hotel added successfully" },
+      });
     },
   });
 

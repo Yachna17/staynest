@@ -15,6 +15,8 @@ export default function DashboardPage() {
 
   const queryClient = useQueryClient();
 
+  const userId = user?.id ?? 0;
+
   // delete request; after it succeeds, refetch the list and show a message
   const deleteMutation = useMutation({
     mutationFn: (id: number) => deleteHotel(id, token!),
@@ -26,8 +28,6 @@ export default function DashboardPage() {
 
   // the hotel waiting for delete confirmation (null = dialog closed)
   const [hotelToDelete, setHotelToDelete] = useState<Hotel | null>(null);
-
-  const userId = user?.id ?? 0;
 
   // fetch only this user's hotels; "enabled" waits until the user exists
   const { data, error, isLoading } = useQuery({
@@ -52,9 +52,15 @@ export default function DashboardPage() {
 
   // loading, error and empty states
   if (!user)
-    return <div className="px-4 py-20 text-center">Please log in to view your dashboard.</div>;
+    return (
+      <div className="px-4 py-20 text-center">
+        Please log in to view your dashboard.
+      </div>
+    );
   if (isLoading)
-    return <div className="px-4 py-20 text-center text-neutral-500">Loading...</div>;
+    return (
+      <div className="px-4 py-20 text-center text-neutral-500">Loading...</div>
+    );
   if (error)
     return (
       <div className="px-4 py-20 text-center text-red-600">
@@ -85,7 +91,7 @@ export default function DashboardPage() {
             aria-label="Close message"
             className="text-xl leading-none"
           >
-            ×
+            x
           </button>
         </div>
       )}
