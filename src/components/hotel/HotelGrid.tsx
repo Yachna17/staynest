@@ -13,7 +13,9 @@ export default function HotelGrid() {
 
   // loading, error and empty states
   if (isLoading)
-    return <div className="px-4 py-10 text-center text-neutral-500">Loading...</div>;
+    return (
+      <div className="px-4 py-10 text-center text-neutral-500">Loading...</div>
+    );
   if (error)
     return (
       <div className="px-4 py-10 text-center text-red-600">
@@ -21,7 +23,11 @@ export default function HotelGrid() {
       </div>
     );
   if (!data || data.length === 0)
-    return <div className="px-4 py-10 text-center text-neutral-500">No hotels yet</div>;
+    return (
+      <div className="px-4 py-10 text-center text-neutral-500">
+        No hotels yet
+      </div>
+    );
 
   // 1 column on mobile, 2 on tablet (sm), 3 on desktop (lg)
   return (
@@ -32,7 +38,10 @@ export default function HotelGrid() {
           hotelName={hotel.name}
           city={hotel.city}
           price={hotel.price}
-          image={hotel.image}
+          images={hotel.images}
+          description={hotel.description}
+          address={hotel.address}
+          rooms={hotel.rooms}
         ></HotelCard>
       ))}
     </div>

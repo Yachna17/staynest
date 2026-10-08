@@ -11,29 +11,17 @@ export default function Footer() {
   return (
     <footer className="mt-20 border-t border-neutral-200 bg-white">
       <div className="grid grid-cols-1 items-center gap-4 px-4 py-8 text-center sm:grid-cols-3 sm:px-10">
-        <Link to="/" className="justify-self-center sm:justify-self-start">
-          <img
-            src={logo}
-            alt="StayNestLogo"
-            className="h-14 w-14 object-contain"
-          />
-        </Link>
+        <img
+          src={logo}
+          alt="StayNestLogo"
+          className="h-14 w-14 object-contain"
+        />
 
         <p className="text-sm text-neutral-500 sm:justify-self-center">
           &copy; 2026 All rights reserved
         </p>
 
         <nav className="flex flex-wrap justify-center gap-x-5 gap-y-2 text-sm font-medium sm:justify-self-end">
-          <Link to="/" className="hover:underline">
-            Home
-          </Link>
-
-          {/* a normal <a> is used because the link has to work from other pages too:
-              it goes to the home page and then scrolls to #hotels */}
-          <a href="/#hotels" className="hover:underline">
-            Browse Hotels
-          </a>
-
           {user ? (
             <>
               <Link to="/dashboard" className="hover:underline">
@@ -45,6 +33,11 @@ export default function Footer() {
             </>
           ) : (
             <>
+              {/* a normal <a> is used because the link has to work from other pages too:
+              it goes to the home page and then scrolls to #hotels */}
+              <a href="/#hotels" className="hover:underline">
+                Browse Hotels
+              </a>
               <Link to="/login" className="hover:underline">
                 Login
               </Link>

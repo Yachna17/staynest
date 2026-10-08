@@ -25,7 +25,6 @@ export default function HotelForm({
           address: defaultValues.address,
           price: defaultValues.price,
           rooms: defaultValues.rooms,
-          image: defaultValues.image ?? "",
           description: defaultValues.description,
         }
       : {
@@ -34,7 +33,6 @@ export default function HotelForm({
           address: "",
           price: undefined,
           rooms: undefined,
-          image: "",
           description: "",
         },
   });
@@ -145,22 +143,54 @@ export default function HotelForm({
       </div>
 
       <div className="flex flex-col gap-1">
-        <label
-          htmlFor="image-url"
-          className="text-sm font-medium text-neutral-700"
-        >
-          Image URL
+        <label htmlFor="image" className="text-sm font-medium text-neutral-700">
+          Images
         </label>
+        {/* Edit page only: the images already saved on the server */}
+        {defaultValues?.images?.length ? (
+          <div className="flex flex-wrap gap-2">
+            {defaultValues.images.map((url) => (
+              <img
+                key={url}
+                src={url}
+                alt="Current hotel image"
+                className="h-16 w-16 rounded-lg object-cover"
+              />
+            ))}
+          </div>
+        ) : null}
         <input
-          id="image-url"
-          type="url"
+          id="image"
+          type="file"
+          accept="image/*"
+          multiple
           className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-base transition focus:border-black focus:outline-none focus:ring-2 focus:ring-black/10"
-          {...register("image", {
-            required: { value: true, message: "Image is required" },
+          {...register("images", {
+            // required on Add only; on Edit the user may keep the old images
+            required: defaultValues ? false : "At least one image is required",
+            // server limits: max 10 files, 5 MB each
+            validate: (files) => {
+              // nothing picked (allowed on Edit); "required" decides if that's OK
+              if (!files || files.length === 0) return true;
+              if (files.length > 10) {
+                return `You can upload up to 10 images`;
+              }
+              if (
+                Array.from(files).some((file) => file.size > 5 * 1024 * 1024)
+              ) {
+                return "Each image must be 5 MB or smaller";
+              }
+              return true;
+            },
           })}
         />
-        {errors.image && (
-          <p className="text-sm text-red-600">{errors.image.message}</p>
+        {defaultValues && (
+          <p className="text-xs text-neutral-500">
+            New images are added to the current ones.
+          </p>
+        )}
+        {errors.images && (
+          <p className="text-sm text-red-600">{errors.images.message}</p>
         )}
       </div>
 

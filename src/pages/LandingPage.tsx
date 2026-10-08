@@ -1,8 +1,14 @@
+import { Navigate } from "react-router-dom";
 import Hero from "../components/Hero";
 import HotelGrid from "../components/hotel/HotelGrid";
+import { useAuth } from "../context/AuthContext";
 
 // Home page ( / ): intro section on top, list of all hotels below
 export default function LandingPage() {
+  const { user } = useAuth();
+
+  if (user) return <Navigate to="/dashboard" replace />;
+
   return (
     <>
       <Hero />

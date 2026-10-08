@@ -9,9 +9,5 @@ export default function ProtectedRoutes() {
   // "replace" swaps the history entry, so the Back button doesn't return to the blocked page
   if (!user) return <Navigate to={"/login"} replace />;
 
-  return (
-    <>
-      <Outlet />
-    </>
-  );
+  return <Outlet />;
 }

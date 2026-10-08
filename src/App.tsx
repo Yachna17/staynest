@@ -6,9 +6,10 @@ import RegisterPage from "./pages/RegisterPage.tsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthContextProvider } from "./context/AuthContext.tsx";
 import DashboardPage from "./pages/DashboardPage.tsx";
-import ProtectedRoutes from "./components/ProtectedRoutes.tsx";
+import ProtectedRoutes from "./routes/ProtectedRoutes.tsx";
 import AddHotelPage from "./pages/AddHotelPage.tsx";
 import EditHotelPage from "./pages/EditHotelPage.tsx";
+import RedirectIfAuthenticated from "./routes/RedirectIfAuthenticated.tsx";
 
 // One QueryClient for the whole app. It holds React Query's cache of API data.
 const queryClient = new QueryClient();
@@ -32,10 +33,11 @@ function App() {
                 <Route path="/dashboard/edit/:id" element={<EditHotelPage />} />
               </Route>
             </Route>
-
-            {/* Login and Register are full-screen pages without Header/Footer */}
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
+            <Route element={<RedirectIfAuthenticated />}>
+              {/* Login and Register are full-screen pages without Header/Footer */}
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+            </Route>
           </Routes>
         </BrowserRouter>
       </AuthContextProvider>

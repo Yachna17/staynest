@@ -10,7 +10,8 @@ export interface Hotel {
   price: number; // price per night
   rooms: number;
   description: string;
-  image: string | null; // cover image URL (can be empty)
+  images: string[]; // full URLs from the server
+  image: string | null; // first image, set by the server
 }
 
 // The fields the Add / Edit form works with (no id or userId, the server sets those)
@@ -21,7 +22,7 @@ export interface HotelFormValues {
   price: number;
   rooms: number;
   description: string;
-  image: string | null;
+  images: FileList; // files picked in the form
 }
 
 // Logged-in user (the API never sends the password back)

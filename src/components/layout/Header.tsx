@@ -65,13 +65,12 @@ export default function Header() {
     // sticky: the header stays at the top while scrolling
     <header className="sticky top-0 z-40 border-b border-neutral-200 bg-white/90 px-4 backdrop-blur sm:px-10">
       <div className="flex items-center gap-3">
-        <Link to="/" onClick={() => setOpen(false)}>
-          <img
-            src={logo}
-            alt="StayNestLogo"
-            className="h-14 w-14 object-contain sm:h-16 sm:w-16"
-          />
-        </Link>
+        <img
+          src={logo}
+          alt="StayNestLogo"
+          className="h-14 w-14 object-contain sm:h-16 sm:w-16"
+        />
+
         {/* grow pushes everything after it to the right */}
         <span className="grow"></span>
 

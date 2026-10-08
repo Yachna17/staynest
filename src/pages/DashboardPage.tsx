@@ -114,10 +114,19 @@ export default function DashboardPage() {
             key={hotel.id}
             hotelName={hotel.name}
             city={hotel.city}
+            address={hotel.address}
             price={hotel.price}
-            image={hotel.image}
-            onEdit={() => navigate(`/dashboard/edit/${hotel.id}`)}
-            onDelete={() => setHotelToDelete(hotel)}
+            rooms={hotel.rooms}
+            description={hotel.description}
+            images={hotel.images}
+            onEdit={(event) => {
+              event.stopPropagation();
+              navigate(`/dashboard/edit/${hotel.id}`);
+            }}
+            onDelete={(event) => {
+              event.stopPropagation();
+              setHotelToDelete(hotel);
+            }}
           ></HotelCard>
         ))}
       </div>
