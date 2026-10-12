@@ -22,7 +22,12 @@ export default function DashboardPage() {
     mutationFn: (id: number) => deleteHotel(id, token!),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["hotels", "mine", userId] });
+      setErrorMessage(null);
       setMessage("Hotel deleted successfully");
+    },
+    onError: (error) => {
+      setMessage(null);
+      setErrorMessage(error.message);
     },
   });
 
@@ -43,12 +48,47 @@ export default function DashboardPage() {
     location.state?.message ?? null,
   );
 
+  const [errorMessage, setErrorMessage] = useState<string | null>(
+    location.state?.error ?? null,
+  );
+
   // clear the router state so the message doesn't come back after a refresh
   useEffect(() => {
-    if (location.state?.message) {
+    if (location.state?.message || location.state?.error) {
       navigate(location.pathname, { replace: true, state: null });
     }
   }, [location, navigate]);
+
+  // success and error banners, shared by the empty state and the normal view
+  const banners = (
+    <>
+      {message && (
+        <div className="mx-4 mb-4 mt-4 flex items-center justify-between rounded-lg border border-green-300 bg-green-50 px-4 py-2 text-green-800 sm:mx-10">
+          <span>{message}</span>
+          <button
+            onClick={() => setMessage(null)}
+            aria-label="Close message"
+            className="text-xl leading-none"
+          >
+            x
+          </button>
+        </div>
+      )}
+
+      {errorMessage && (
+        <div className="mx-4 mb-4 mt-4 flex items-center justify-between rounded-lg border border-red-300 bg-red-50 px-4 py-2 text-red-800 sm:mx-10">
+          <span>{errorMessage}</span>
+          <button
+            onClick={() => setErrorMessage(null)}
+            aria-label="Close error message"
+            className="text-xl leading-none"
+          >
+            x
+          </button>
+        </div>
+      )}
+    </>
+  );
 
   // loading, error and empty states
   if (!user)
@@ -69,32 +109,24 @@ export default function DashboardPage() {
     );
   if (!data || data.length === 0)
     return (
-      <div className="flex flex-col items-center gap-4 px-4 py-20 text-center">
-        <p className="text-neutral-600">No Hotels yet</p>
-        <Link
-          to={"/dashboard/add"}
-          className="rounded-full bg-black px-5 py-2 text-white transition hover:bg-neutral-800"
-        >
-          + Add Hotel
-        </Link>
-      </div>
+      <>
+        {banners}
+        <div className="flex flex-col items-center gap-4 px-4 py-20 text-center">
+          <p className="text-neutral-600">No Hotels yet</p>
+          <Link
+            to={"/dashboard/add"}
+            className="rounded-full bg-black px-5 py-2 text-white transition hover:bg-neutral-800"
+          >
+            + Add Hotel
+          </Link>
+        </div>
+      </>
     );
 
   return (
     <div className="pb-6">
       {/* success message (added / updated / deleted) with a close button */}
-      {message && (
-        <div className="mx-4 mb-4 mt-4 flex items-center justify-between rounded-lg border border-green-300 bg-green-50 px-4 py-2 text-green-800 sm:mx-10">
-          <span>{message}</span>
-          <button
-            onClick={() => setMessage(null)}
-            aria-label="Close message"
-            className="text-xl leading-none"
-          >
-            x
-          </button>
-        </div>
-      )}
+      {banners}
 
       {/* page title on the left, Add Hotel button on the right */}
       <section className="flex flex-wrap items-center justify-between gap-3 px-4 py-6 sm:px-10">
@@ -135,11 +167,12 @@ export default function DashboardPage() {
       <ConfirmDialog
         isOpen={hotelToDelete !== null}
         message={`Delete "${hotelToDelete?.name}"? This can't be undone.`}
+        isPending={deleteMutation.isPending}
         onCancel={() => setHotelToDelete(null)}
         onConfirm={() => {
           if (hotelToDelete) {
             deleteMutation.mutate(hotelToDelete.id, {
-              onSuccess: () => setHotelToDelete(null),
+              onSettled: () => setHotelToDelete(null),
             });
           }
         }}

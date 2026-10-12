@@ -51,11 +51,6 @@ export default function HotelCard({
     setCurrentImageIndex((i) => (i + 1) % list.length);
   }
 
-  function showImage(event: React.MouseEvent, index: number) {
-    event.stopPropagation();
-    setCurrentImageIndex(index);
-  }
-
   return (
     // the card lifts up slightly on hover
     <section
@@ -88,19 +83,6 @@ export default function HotelCard({
             >
               <ChevronRight className="h-5 w-5" />
             </button>
-
-            <div className="absolute bottom-2 left-1/2 flex -translate-x-1/2 gap-1.5">
-              {list.map((url, index) => (
-                <button
-                  key={url}
-                  onClick={(event) => showImage(event, index)}
-                  aria-label={`Show image ${index + 1}`}
-                  className={`h-2 w-2 rounded-full transition ${
-                    index === currentImageIndex ? "bg-white" : "bg-white/50"
-                  }`}
-                />
-              ))}
-            </div>
           </>
         )}
       </div>

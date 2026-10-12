@@ -31,13 +31,25 @@ export default function EditHotelPage() {
         state: { message: "Hotel updated successfully" },
       });
     },
+    onError: (error) => {
+      // go to the dashboard and pass the error for it to show
+      navigate("/dashboard", {
+        state: { error: error.message },
+      });
+    },
   });
 
   // guard states before showing the form
   if (!id || Number.isNaN(hotelId))
-    return <div className="px-4 py-20 text-center text-neutral-500">Invalid hotel.</div>;
+    return (
+      <div className="px-4 py-20 text-center text-neutral-500">
+        Invalid hotel.
+      </div>
+    );
   if (isLoading)
-    return <div className="px-4 py-20 text-center text-neutral-500">Loading...</div>;
+    return (
+      <div className="px-4 py-20 text-center text-neutral-500">Loading...</div>
+    );
   if (error)
     return (
       <div className="px-4 py-20 text-center text-red-600">
@@ -45,7 +57,11 @@ export default function EditHotelPage() {
       </div>
     );
   if (!data)
-    return <div className="px-4 py-20 text-center text-neutral-500">Hotel not found.</div>;
+    return (
+      <div className="px-4 py-20 text-center text-neutral-500">
+        Hotel not found.
+      </div>
+    );
 
   return (
     <div className="mx-auto w-full max-w-xl px-4 py-8 sm:py-12">

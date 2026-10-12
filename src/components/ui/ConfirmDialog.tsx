@@ -1,6 +1,7 @@
 interface ConfirmDialogProps {
   isOpen: boolean;
   message: string;
+  isPending: boolean; // true while the delete request is running
   onConfirm: () => void;
   onCancel: () => void;
 }
@@ -10,6 +11,7 @@ interface ConfirmDialogProps {
 export default function ConfirmDialog({
   isOpen,
   message,
+  isPending = false,
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
@@ -24,15 +26,17 @@ export default function ConfirmDialog({
         <div className="mt-6 flex justify-end gap-3">
           <button
             onClick={onCancel}
-            className="rounded-full border border-neutral-300 px-4 py-2 transition hover:bg-neutral-100"
+            disabled={isPending}
+            className="rounded-full border border-neutral-300 px-4 py-2 transition hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-50 "
           >
             Cancel
           </button>
           <button
             onClick={onConfirm}
-            className="rounded-full bg-red-600 px-4 py-2 text-white transition hover:bg-red-700"
+            disabled={isPending}
+            className="rounded-full bg-red-600 px-4 py-2 text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Delete
+            {isPending ? "Deleting..." : "Delete"}
           </button>
         </div>
       </div>

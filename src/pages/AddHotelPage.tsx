@@ -23,6 +23,12 @@ export default function AddHotelPage() {
         state: { message: "Hotel added successfully" },
       });
     },
+    onError: (error) => {
+      // go to the dashboard and pass the error for it to show
+      navigate("/dashboard", {
+        state: { error: error.message },
+      });
+    },
   });
 
   return (
