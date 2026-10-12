@@ -1,8 +1,11 @@
 # StayNest
 
-A hotel listing website built as a frontend assignment. Users can register, log in, browse hotels, and manage their own listings (add, edit, delete) from a dashboard.
+A hotel listing website built as a frontend assignment. Users can register, log in, browse hotels, and manage their own listings (add, edit, delete) from a dashboard. Each hotel can have several images, shown in a carousel on its card.
 
-The backend API is provided separately and is not part of this repository.
+The repository has two parts:
+
+- `hotel-listing-frontend/` — the React app (this README)
+- `hotel-listing-backend/` — the provided Express API (see its own README)
 
 ## Tech Stack
 
@@ -11,7 +14,8 @@ The backend API is provided separately and is not part of this repository.
 - **Tailwind CSS** — all styling
 - **React Query (TanStack Query)** — all API calls (`useQuery` for reads, `useMutation` for writes)
 - **React Hook Form** — all forms, with validation and error messages
-- **React Router** — routing, including a protected-route wrapper for private pages
+- **React Router** — routing, including route guards for private and public-only pages
+- **lucide-react** — icons
 
 ## Features
 
@@ -28,31 +32,52 @@ The backend API is provided separately and is not part of this repository.
 ### Prerequisites
 
 - Node.js 20 or newer
-- The StayNest backend API running locally (see its own README for setup)
 
 ### Installation
 
 ```bash
 git clone <repo-url>
 cd staynest
+```
+
+### 1. Run the backend
+
+```bash
+cd hotel-listing-backend
+npm install
+cp .env.example .env
+```
+
+Open the new `.env` file and allow the frontend's origin (Vite runs on port 5173):
+
+```
+CORS_ORIGIN=http://localhost:5173
+```
+
+Then start the API:
+
+```bash
+npm run dev
+```
+
+The API runs at `http://localhost:4000`. Without the `CORS_ORIGIN` line, the browser blocks the frontend's requests.
+
+### 2. Run the frontend
+
+In a second terminal, from the repository root:
+
+```bash
+cd hotel-listing-frontend
 npm install
 ```
 
-### Environment Variables
-
-Create a `.env` file in the project root:
+Create a `.env` file in `hotel-listing-frontend/`:
 
 ```
 VITE_API_BASE_URL=http://localhost:4000
 ```
 
-Set this to wherever the backend is running. Vite only exposes variables prefixed with `VITE_`, and the dev server needs a restart after changing this file.
-
-### Run the backend
-
-Start the provided backend API separately, and make sure its `CORS_ORIGIN` allows this app's origin (`http://localhost:5173` by default for Vite).
-
-### Run the frontend
+Vite only exposes variables prefixed with `VITE_`, and the dev server needs a restart after changing this file.
 
 ```bash
 npm run dev
@@ -62,16 +87,16 @@ The app runs at `http://localhost:5173`.
 
 ## Routes
 
-| Path                  | Access  | Description                     |
-| --------------------- | ------- | ------------------------------- |
-| `/`                   | Public  | Landing page with all hotels    |
-| `/login`              | Public  | Login form                      |
-| `/register`           | Public  | Registration form               |
-| `/dashboard`          | Private | The logged-in user's own hotels |
-| `/dashboard/add`      | Private | Add a new hotel                 |
-| `/dashboard/edit/:id` | Private | Edit an existing hotel          |
+| Path                  | Access     | Description                     |
+| --------------------- | ---------- | ------------------------------- |
+| `/`                   | Logged out | Landing page with all hotels    |
+| `/login`              | Logged out | Login form                      |
+| `/register`           | Logged out | Registration form               |
+| `/dashboard`          | Logged in  | The logged-in user's own hotels |
+| `/dashboard/add`      | Logged in  | Add a new hotel                 |
+| `/dashboard/edit/:id` | Logged in  | Edit an existing hotel          |
 
-Private routes redirect to `/login` if there is no logged-in user.
+Private routes redirect to `/login` if there is no logged-in user. Logged-in users who open `/`, `/login` or `/register` are redirected to the dashboard.
 
 ## Screenshots
 
@@ -86,11 +111,11 @@ Login Page
 Register Page
 ![Register page](screenshots/register.png)
 
-Dahboard Page
+Dashboard Page
 ![Dashboard page](screenshots/dashboard.png)
 
 Add Hotel Page
-![Add Hotel page](screenshots/add hotel.png)
+![Add Hotel page](screenshots/add-hotel.png)
 
 Edit Hotel Page
-![Edit Hotel page](screenshots/edit hotel.png)
+![Edit Hotel page](screenshots/edit-hotel.png)
