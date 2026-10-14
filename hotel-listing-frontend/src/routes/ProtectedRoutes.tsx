@@ -4,10 +4,11 @@ import { useAuth } from "../context/AuthContext";
 // Guard for private pages (dashboard, add hotel, edit hotel).
 // Logged out -> redirect to /login. Logged in -> render the child route via <Outlet />.
 export default function ProtectedRoutes() {
-  const { user } = useAuth();
+  const { user, justLoggedOut } = useAuth();
 
-  // "replace" swaps the history entry, so the Back button doesn't return to the blocked page
-  if (!user) return <Navigate to={"/login"} replace />;
+  // after an intentional logout go to the landing page, otherwise to /login
+  if (!user)
+    return <Navigate to={justLoggedOut.current ? "/" : "/login"} replace />;
 
   return <Outlet />;
 }

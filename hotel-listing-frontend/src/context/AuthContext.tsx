@@ -1,4 +1,11 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useRef,
+  type ReactNode,
+  type RefObject,
+} from "react";
 import type { User } from "../types";
 
 // What every component can read from the context
@@ -7,6 +14,8 @@ interface AuthContextType {
   token: string | null;
   login: (user: User, token: string) => void;
   logout: () => void;
+  // true after the user clicked Logout, so route guards can redirect to "/"
+  justLoggedOut: RefObject<boolean>;
 }
 
 // undefined by default, so useAuth() can detect use outside the provider
@@ -28,8 +37,11 @@ export function AuthContextProvider({ children }: AuthProviderProps) {
     return localStorage.getItem("token");
   });
 
+  const justLoggedOut = useRef(false);
+
   // Called after a successful login or register: save in state AND localStorage
   function login(user: User, token: string) {
+    justLoggedOut.current = false;
     setUser(user);
     setToken(token);
     localStorage.setItem("user", JSON.stringify(user));
@@ -38,6 +50,7 @@ export function AuthContextProvider({ children }: AuthProviderProps) {
 
   // Clear both state and localStorage
   function logout() {
+    justLoggedOut.current = true;
     setUser(null);
     setToken(null);
     localStorage.removeItem("user");
@@ -45,7 +58,9 @@ export function AuthContextProvider({ children }: AuthProviderProps) {
   }
 
   return (
-    <AuthContext value={{ user, token, login, logout }}>{children}</AuthContext>
+    <AuthContext value={{ user, token, login, logout, justLoggedOut }}>
+      {children}
+    </AuthContext>
   );
 }
 
