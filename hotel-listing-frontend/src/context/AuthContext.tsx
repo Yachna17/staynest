@@ -12,6 +12,7 @@ import type { User } from "../types";
 interface AuthContextType {
   user: User | null;
   token: string | null;
+
   login: (user: User, token: string) => void;
   logout: () => void;
   // true after the user clicked Logout, so route guards can redirect to "/"
@@ -44,6 +45,7 @@ export function AuthContextProvider({ children }: AuthProviderProps) {
     justLoggedOut.current = false;
     setUser(user);
     setToken(token);
+
     localStorage.setItem("user", JSON.stringify(user));
     localStorage.setItem("token", token);
   }
@@ -53,6 +55,7 @@ export function AuthContextProvider({ children }: AuthProviderProps) {
     justLoggedOut.current = true;
     setUser(null);
     setToken(null);
+
     localStorage.removeItem("user");
     localStorage.removeItem("token");
   }

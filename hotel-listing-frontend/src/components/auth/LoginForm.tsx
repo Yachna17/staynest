@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import type { LoginCredentials } from "../../types";
 import { useAuth } from "../../context/AuthContext";
+import { getHomePath } from "../../utils/getHomePath";
 import { useMutation } from "@tanstack/react-query";
 import { loginRequest } from "../../api/auth";
 
@@ -24,7 +25,7 @@ export default function LoginForm() {
     onSuccess: (data) => {
       // save the user + token in the context / localStorage, then open the dashboard
       login(data.user, data.accessToken);
-      navigate("/dashboard");
+      navigate(getHomePath(data.user.role));
     },
   });
 

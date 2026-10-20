@@ -34,6 +34,7 @@ export const loginRequest = async ({
 export const registerRequest = async ({
   name,
   email,
+  role,
   password,
 }: RegisterCredentials): Promise<AuthResponse> => {
   const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/register`, {
@@ -42,7 +43,7 @@ export const registerRequest = async ({
       "Content-Type": "application/json",
     },
     // confirmPassword is not sent, the API does not need it
-    body: JSON.stringify({ name, email, password }),
+    body: JSON.stringify({ name, email, password, role }),
   });
 
   if (!res.ok) {

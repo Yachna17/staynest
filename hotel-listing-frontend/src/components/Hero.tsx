@@ -1,4 +1,7 @@
 // Intro section on the landing page: heading, short text and one button.
+
+import { Link } from "react-router-dom";
+
 // Text sizes grow with the screen (text-4xl on mobile up to text-8xl on large screens).
 export default function Hero() {
   return (
@@ -11,12 +14,20 @@ export default function Hero() {
       </p>
 
       {/* href="#hotels" scrolls down to the element with id="hotels" (set in LandingPage) */}
-      <a
-        href="#hotels"
-        className="rounded-full border border-black bg-black px-6 py-2.5 font-medium text-white transition hover:bg-neutral-800"
-      >
-        Browse Hotels
-      </a>
+      <div className="flex items-center gap-3">
+        <a
+          href="#hotels"
+          className="rounded-full border border-black bg-black px-6 py-2.5 font-medium text-white transition hover:bg-neutral-800"
+        >
+          Browse Hotels
+        </a>
+        <Link
+          to="/login"
+          className="rounded-full border border-black px-6 py-2.5  font-medium text-center transition hover:bg-black hover:text-white"
+        >
+          Add Hotel
+        </Link>
+      </div>
     </section>
   );
 }

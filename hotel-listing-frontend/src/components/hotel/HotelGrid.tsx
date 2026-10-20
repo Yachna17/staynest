@@ -1,9 +1,12 @@
 import HotelCard from "./HotelCard.tsx";
 import { getHotels } from "../../api/hotels.ts";
+import { useAuth } from "../../context/AuthContext.tsx";
 import { useQuery } from "@tanstack/react-query";
 
-// Landing page list: fetches all hotels and shows them as cards.
+// List of all hotels as cards. Used on the landing page and on the traveler dashboard.
 export default function HotelGrid() {
+  const { user } = useAuth();
+
   // useQuery is for reading data. The queryKey names this data in React Query's cache.
   // It gives us data, error and isLoading, so we don't need our own useState/useEffect.
   const { data, error, isLoading } = useQuery({
@@ -42,7 +45,9 @@ export default function HotelGrid() {
           description={hotel.description}
           address={hotel.address}
           rooms={hotel.rooms}
-        ></HotelCard>
+          // logged out: Book Now asks to log in first; logged in traveler: open the booking page
+          bookTo={user ? `/user-dashboard/book/${hotel.id}` : "/login"}
+        />
       ))}
     </div>
   );

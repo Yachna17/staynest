@@ -8,7 +8,7 @@ import type { Hotel } from "../types";
 
 import ConfirmDialog from "../components/ui/ConfirmDialog";
 
-// /dashboard - private page: shows only the hotels of the logged-in user
+// /dashboard - private page for managers: shows only the hotels of the logged-in user
 export default function DashboardPage() {
   const { user, token } = useAuth();
   const navigate = useNavigate();
@@ -128,20 +128,29 @@ export default function DashboardPage() {
       {/* success message (added / updated / deleted) with a close button */}
       {banners}
 
-      {/* page title on the left, Add Hotel button on the right */}
+      {/* page title on the left, Bookings and Add Hotel buttons together on the right */}
       <section className="flex flex-wrap items-center justify-between gap-3 px-4 py-6 sm:px-10">
         <h1 className="text-2xl font-bold sm:text-3xl">My Hotels</h1>
-        <Link
-          to="/dashboard/add"
-          className="rounded-full bg-black px-4 py-2 text-sm text-white transition hover:bg-neutral-800"
-        >
-          + Add Hotel
-        </Link>
+        <div className="flex gap-3">
+          <Link
+            to="/dashboard/bookings"
+            className="rounded-full bg-black px-4 py-2 text-sm text-white transition hover:bg-neutral-800"
+          >
+            Bookings
+          </Link>
+          <Link
+            to="/dashboard/add"
+            className="rounded-full bg-black px-4 py-2 text-sm text-white transition hover:bg-neutral-800"
+          >
+            + Add Hotel
+          </Link>
+        </div>
       </section>
 
       {/* 1 column on mobile, 2 on tablet, 3 on desktop */}
       <div className="grid grid-cols-1 gap-6 px-4 sm:grid-cols-2 sm:px-10 lg:grid-cols-3">
         {data.map((hotel) => (
+          // no bookTo here, so managers don't see the Book Now button
           <HotelCard
             key={hotel.id}
             hotelName={hotel.name}
@@ -159,7 +168,7 @@ export default function DashboardPage() {
               event.stopPropagation();
               setHotelToDelete(hotel);
             }}
-          ></HotelCard>
+          />
         ))}
       </div>
 

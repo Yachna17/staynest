@@ -4,12 +4,19 @@ import { useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 import { registerRequest } from "../../api/auth";
 import { useAuth } from "../../context/AuthContext";
+import { getHomePath } from "../../utils/getHomePath";
 
 export default function RegisterForm() {
   // getValues lets us read another field's current value (used to compare the passwords)
   const { register, handleSubmit, formState, getValues } =
     useForm<RegisterCredentials>({
-      defaultValues: { name: "", email: "", password: "", confirmPassword: "" },
+      defaultValues: {
+        name: "",
+        email: "",
+        role: "traveler",
+        password: "",
+        confirmPassword: "",
+      },
     });
 
   const { errors } = formState;
@@ -22,7 +29,7 @@ export default function RegisterForm() {
     mutationFn: registerRequest,
     onSuccess: (data) => {
       login(data.user, data.accessToken);
-      navigate("/dashboard");
+      navigate(getHomePath(data.user.role));
     },
   });
 
@@ -85,6 +92,31 @@ export default function RegisterForm() {
                 <p className="text-sm text-red-600">{errors.email.message}</p>
               )}
             </div>
+
+            <fieldset className="flex flex-col gap-1">
+              <legend className="text-sm font-medium text-neutral-700">
+                I am joining as
+              </legend>
+
+              <div className="mt-1 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                {[
+                  { value: "traveler", label: "Traveler" },
+                  { value: "manager", label: "Hotel manager" },
+                ].map((role) => (
+                  <label key={role.value} className="cursor-pointer">
+                    <input
+                      type="radio"
+                      value={role.value}
+                      className="peer sr-only"
+                      {...register("role")}
+                    />
+                    <div className="rounded-lg border border-neutral-300 bg-white px-3 py-3 text-base font-semibold text-neutral-800 transition hover:border-neutral-400 peer-checked:border-black peer-checked:ring-2 peer-checked:ring-black/10 peer-focus-visible:ring-2 peer-focus-visible:ring-black/30">
+                      {role.label}
+                    </div>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
 
             <div className="flex flex-col gap-1">
               <label

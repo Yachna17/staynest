@@ -1,11 +1,12 @@
 import { Link } from "react-router-dom";
 import logo from "../../assets/StayNestLogo.png";
 import { useAuth } from "../../context/AuthContext";
+import { getHomePath } from "../../utils/getHomePath";
 
 // Footer: logo, copyright and a few links.
 // Mobile: one column, centered. From sm up: three columns (left, center, right).
 export default function Footer() {
-  // the links change depending on whether the user is logged in
+  // the links change depending on whether the user is logged in, and on their role
   const { user } = useAuth();
 
   return (
@@ -24,12 +25,15 @@ export default function Footer() {
         <nav className="flex flex-wrap justify-center gap-x-5 gap-y-2 text-sm font-medium sm:justify-self-end">
           {user ? (
             <>
-              <Link to="/dashboard" className="hover:underline">
+              <Link to={getHomePath(user.role)} className="hover:underline">
                 Dashboard
               </Link>
-              <Link to="/dashboard/add" className="hover:underline">
-                Add Hotel
-              </Link>
+              {/* only managers can add hotels */}
+              {user.role === "manager" && (
+                <Link to="/dashboard/add" className="hover:underline">
+                  Add Hotel
+                </Link>
+              )}
             </>
           ) : (
             <>

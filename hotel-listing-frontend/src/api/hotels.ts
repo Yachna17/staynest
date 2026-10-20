@@ -69,8 +69,8 @@ export const createHotel = async (
   return res.json();
 };
 
-// GET /hotels/:id -> one hotel (used to fill the edit form)
-export const getHotelsById = async (id: number): Promise<Hotel> => {
+// GET /hotels/:id -> one hotel (used to fill the edit form and the booking page)
+export const getHotelById = async (id: number): Promise<Hotel> => {
   const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/hotels/${id}`);
   if (!res.ok) throw new Error(`Failed to fetch hotel (status ${res.status})`);
   return res.json();

@@ -25,11 +25,15 @@ export interface HotelFormValues {
   images: FileList; // files picked in the form
 }
 
+// A traveler books hotels, a manager owns hotels and confirms bookings
+export type Role = "traveler" | "manager";
+
 // Logged-in user (the API never sends the password back)
 export interface User {
   id: number;
   name: string;
   email: string;
+  role: Role;
 }
 
 // Response of /login and /register
@@ -47,6 +51,34 @@ export interface LoginCredentials {
 export interface RegisterCredentials {
   name: string;
   email: string;
+  role: Role;
   password: string;
   confirmPassword: string;
+}
+
+export type BookingStatus = "pending" | "confirmed" | "rejected" | "cancelled";
+
+// A booking exactly as the API returns it
+export interface Booking {
+  id: number;
+  hotelId: number;
+  name: string; // traveler who booked
+  email: string;
+  contactInfo: string;
+  hotelName: string;
+  hotelImage: string | null;
+  checkIn: string; // ISO date
+  checkOut: string; // ISO date
+  guests: number;
+  totalPrice: number;
+  status: BookingStatus;
+}
+
+// The fields the booking form works with. hotelId is added when the request is sent,
+// and the server fills in the rest (name, email, hotel details, price, status).
+export interface BookingFormValues {
+  contactInfo: string;
+  checkIn: string;
+  checkOut: string;
+  guests: number;
 }

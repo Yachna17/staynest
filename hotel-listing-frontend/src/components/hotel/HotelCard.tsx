@@ -1,6 +1,7 @@
 import { useState } from "react";
 import placeholder from "../../assets/hotel.jpg";
 import { Pencil, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 interface HotelCardProps {
   hotelName: string;
@@ -10,13 +11,16 @@ interface HotelCardProps {
   rooms: number;
   description: string;
   images: string[];
-  // optional: only the dashboard passes these, so the landing page shows no buttons
+  // optional: only the landing page and the traveler dashboard pass this,
+  // so the manager dashboard shows no Book Now button
+  bookTo?: string;
+  // optional: only the manager dashboard passes these, so the landing page shows no buttons
   onEdit?: (event: React.MouseEvent) => void;
   onDelete?: (event: React.MouseEvent) => void;
 }
 
-// One hotel card, used on the landing page and on the dashboard.
-// It only shows data; the parent decides what edit and delete do.
+// One hotel card, used on the landing page, the traveler dashboard and the manager dashboard.
+// It only shows data; the parent decides where Book Now goes and what edit and delete do.
 export default function HotelCard({
   hotelName,
   city,
@@ -25,48 +29,51 @@ export default function HotelCard({
   rooms,
   description,
   images,
+  bookTo,
   onEdit,
   onDelete,
 }: HotelCardProps) {
-  const [expand, setExpand] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   // always at least one picture: older hotels may have no images at all
-  const list = images?.length ? images : [placeholder];
-  const hasMany = list.length > 1;
+  const imageList = images?.length ? images : [placeholder];
+  const hasManyImages = imageList.length > 1;
 
-  function handleClick() {
-    setExpand(!expand);
+  function toggleExpand() {
+    setIsExpanded(!isExpanded);
   }
 
   // stopPropagation: the whole card toggles expand on click,
   // so the carousel controls must not trigger that
   function showPrevious(event: React.MouseEvent) {
     event.stopPropagation();
-    setCurrentImageIndex((i) => (i - 1 + list.length) % list.length);
+    setCurrentImageIndex(
+      (index) => (index - 1 + imageList.length) % imageList.length,
+    );
   }
 
   function showNext(event: React.MouseEvent) {
     event.stopPropagation();
-    setCurrentImageIndex((i) => (i + 1) % list.length);
+    setCurrentImageIndex((index) => (index + 1) % imageList.length);
   }
 
   return (
     // the card lifts up slightly on hover
     <section
-      onClick={handleClick}
+      onClick={toggleExpand}
       className="rounded-4xl bg-black p-4 text-white shadow-md transition duration-200 hover:-translate-y-1 hover:shadow-xl sm:p-5"
     >
-      {/* relative: the arrows and dots are positioned inside this box */}
+      {/* relative: the arrows are positioned inside this box */}
       <div className="relative">
         <img
-          src={list[currentImageIndex] ?? list[0]}
+          src={imageList[currentImageIndex] ?? imageList[0]}
           alt={hotelName}
           className="h-56 w-full rounded-3xl object-cover sm:h-64"
         />
 
-        {/* arrows and dots only when there is more than one image */}
-        {hasMany && (
+        {/* arrows only when there is more than one image */}
+        {hasManyImages && (
           <>
             <button
               onClick={showPrevious}
@@ -88,18 +95,17 @@ export default function HotelCard({
       </div>
 
       <div className="mt-5 flex items-end justify-between gap-3">
-        {/* min-w-0 lets long names be cut with "..." instead of breaking the layout */}
         <div className="min-w-0">
           <p className="truncate text-xl font-semibold">{hotelName}</p>
           <p className="truncate text-sm text-neutral-300">{city}</p>
-          {expand && (
+          {isExpanded && (
             <p className="truncate text-sm text-neutral-300">{address}</p>
           )}
           <p className="mt-1">
             <span className="font-semibold">${price}</span>
             <span className="text-sm text-neutral-300">/night</span>
           </p>
-          {expand && (
+          {isExpanded && (
             <>
               <p className="truncate text-sm text-neutral-300">
                 Number of Rooms: {rooms}
@@ -110,6 +116,16 @@ export default function HotelCard({
             </>
           )}
         </div>
+
+        {/* Book Now only appears when the parent passes a link */}
+        {bookTo && (
+          <Link
+            to={bookTo}
+            className="shrink-0 rounded-full bg-white px-4 py-1.5 text-center text-sm font-medium text-black transition hover:bg-neutral-200"
+          >
+            Book Now
+          </Link>
+        )}
 
         {/* edit/delete buttons only appear when the parent passes the handlers */}
         {(onEdit || onDelete) && (

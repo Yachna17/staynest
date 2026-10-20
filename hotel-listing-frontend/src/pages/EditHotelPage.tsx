@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams, useNavigate } from "react-router-dom";
-import { getHotelsById, updateHotel } from "../api/hotels";
+import { getHotelById, updateHotel } from "../api/hotels";
 import HotelForm from "../components/hotel/HotelForm";
 import { useAuth } from "../context/AuthContext";
 import type { HotelFormValues } from "../types";
@@ -18,7 +18,7 @@ export default function EditHotelPage() {
   // load the hotel so the form can be pre-filled; the id is part of the key
   const { data, isLoading, error } = useQuery({
     queryKey: ["hotels", hotelId],
-    queryFn: () => getHotelsById(hotelId),
+    queryFn: () => getHotelById(hotelId),
   });
 
   const hotelMutation = useMutation({

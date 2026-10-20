@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import logo from "../../assets/StayNestLogo.png";
 import { useAuth } from "../../context/AuthContext";
+import { getHomePath } from "../../utils/getHomePath";
 
 export default function Header() {
   const { user, logout } = useAuth();
@@ -21,20 +22,15 @@ export default function Header() {
   // twice below: in the desktop nav and in the mobile menu.
   const links = user ? (
     <>
+      {/* a traveler's Dashboard and a manager's Dashboard are different pages */}
       <Link
-        to="/dashboard"
+        to={getHomePath(user.role)}
         onClick={() => setOpen(false)}
         className="rounded-full px-4 py-1.5 text-center transition hover:bg-neutral-100"
       >
         Dashboard
       </Link>
-      <Link
-        to="/dashboard/add"
-        onClick={() => setOpen(false)}
-        className="rounded-full border border-black px-4 py-1.5 text-center transition hover:bg-black hover:text-white"
-      >
-        Add Hotel
-      </Link>
+
       <button
         onClick={handleLogout}
         className="rounded-full border border-black bg-black px-4 py-1.5 text-center text-white transition hover:bg-neutral-800"
